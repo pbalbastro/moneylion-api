@@ -19,7 +19,7 @@ public class EmployeeTests {
     }
 
     @Test
-    public void postRequest() {
+    public void createNewEmployee() {
         Response response = given()
                 .header("Content-type", "application/json")
                 .and()
@@ -36,7 +36,7 @@ public class EmployeeTests {
         }
 
     @Test
-    public void getRequest() {
+    public void verifyIdNo() {
         Response response = given()
                 .contentType(ContentType.JSON)
                 .when()
@@ -48,4 +48,4 @@ public class EmployeeTests {
         Assertions.assertEquals("11", response.jsonPath().getString("id"));
         Assertions.assertEquals("Jena Gaines", response.jsonPath().getString("name"));
     }
-    }
+}
