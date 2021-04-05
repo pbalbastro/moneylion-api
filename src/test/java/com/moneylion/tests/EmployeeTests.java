@@ -11,41 +11,63 @@ import static io.restassured.RestAssured.given;
 
 public class EmployeeTests {
 
-    private static String requestBody = "{\"name\":\"Patrick\",\"salary\":\"123\",\"age\":\"23\"}";
+    private static String projectRequestBody = "{\"name\": \"Grocery List\"}";
+    private static String taskRequestBody = "{\"content\": \"Buy Kombucha\", \"project_id\": 2262466429}";
+    private static String updateTaskRequestBody = "{\"due_string\": \"tomorrow\"}";
+    private static String bearerToken = "ada93225217defb21d7b33afa0f01b6c3b5d1f61";
 
     @BeforeAll
     public static void setup() {
-        RestAssured.baseURI = "http://dummy.restapiexample.com";
+        RestAssured.baseURI = "https://api.todoist.com";
     }
 
     @Test
-    public void createNewEmployee() {
+    public void createNewProject() {
         Response response = given()
-                .header("Content-type", "application/json")
+                .headers("Authorization",
+                        "Bearer " + bearerToken,
+                        "Content-type", "application/json")
                 .and()
-                .body(requestBody)
+                .body(projectRequestBody)
                 .when()
-                .post("/api/v1/create")
+                .post("/rest/v1/projects")
                 .then()
                 .extract().response();
 
         Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals("Patrick", response.jsonPath().getString("name"));
-        Assertions.assertEquals("123", response.jsonPath().getString("salary"));
-        Assertions.assertEquals("23", response.jsonPath().getString("age"));
+        Assertions.assertEquals("Grocery List", response.jsonPath().getString("name"));
         }
 
     @Test
-    public void verifyIdNo() {
+    public void createNewTask() {
         Response response = given()
-                .contentType(ContentType.JSON)
+                .headers("Authorization",
+                        "Bearer " + bearerToken,
+                        "Content-type", "application/json")
+                .and()
+                .body(taskRequestBody)
                 .when()
-                .get("/api/v1/employees")
+                .post("/rest/v1/tasks")
                 .then()
                 .extract().response();
 
         Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals("11", response.jsonPath().getString("id"));
-        Assertions.assertEquals("Jena Gaines", response.jsonPath().getString("name"));
+        Assertions.assertEquals("Buy Kombucha", response.jsonPath().getString("content"));
+    }
+
+    @Test
+    public void updateTaskContent() {
+        Response response = given()
+                .headers("Authorization",
+                        "Bearer " + bearerToken,
+                        "Content-type", "application/json")
+                .and()
+                .body(updateTaskRequestBody)
+                .when()
+                .post("/rest/v1/tasks/4717237076")
+                .then()
+                .extract().response();
+
+        Assertions.assertEquals(204, response.statusCode());
     }
 }
